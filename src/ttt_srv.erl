@@ -21,10 +21,10 @@ handle_call({join, Game, Key}, _From, GameList) ->
   Reply = case ets:lookup(GameList, Game) of
     [{Game, {players_waiting}}]  -> ets:delete(GameList, Game),
                                     ets:insert_new(GameList, {Game,  {pair_waiting, Key}}),
-                                    {ok, joined};
+                                    {ok, "1"};
     [{Game, {pair_waiting, AuthorKey}}] -> ets:delete(GameList, Game), 
                                   ets:insert_new(GameList, {Game,  {game_ready, AuthorKey, Key}}), 
-                                  {ok, joined};
+                                  {ok, "2"};
     [{Game, {game_ready, _, _}}] -> {error, players_exceeded};
     [] -> {error, game_doesnt_exist}
   end,
