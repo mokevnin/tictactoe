@@ -13,6 +13,6 @@ content_types_provided(Req, State) ->
   ], Req, State}.
 
 hello_to_json(Req, State) ->
-  {ok, Pid} = gen_server:call(ttt_srv, {new, self()}),
+  {ok, Pid} = gen_server:call(ttt_srv, {new}),
   Body = list_to_binary(io_lib:format("{\"game_id\":\"~w\"}", [Pid])),
   {Body, Req, State}.

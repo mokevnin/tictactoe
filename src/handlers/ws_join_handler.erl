@@ -13,29 +13,34 @@ init({tcp, http}, _Req, _Opts) ->
 websocket_init(_TransportName, Req, _Opts) ->
   {GameId, Req2} = cowboy_req:binding(id, Req),
   io:format("~p~n", [GameId]),
-  {ok, Pid} = gen_server:call(ttt_srv, {join, list_to_pid(binary_to_list(GameId)), self()}),
+  Pid = list_to_pid(binary_to_list(GameId)),
+  {ok, Count} = gen_server:call(ttt_srv, {join, Pid, self()}),
+  self() ! {hello, Count},
   {ok, Req2, Pid}.
 
 websocket_handle({text, Msg}, Req, GameId) ->
+  {[{_, X}, {_, Y}]} = jiffy:decode(Msg),
   %{X, Req2} = cowboy_req:qs_val(<<"x">>, Req),
   %{Y, Req3} = cowboy_req:qs_val(<<"y">>, Req2),
 
-  %Reply = gen_server:call(ttt_srv, {move, {X, Y}, GameId}),
+  io:format("!!!!! ~p~n", [[GameId, X, Y]]),
+  {ok, _} = gen_server:call(ttt_srv, {move, {X, Y}, GameId, self()}),
 
   %BinaryReply = list_to_binary(io_lib:format("~w~n", [Msg])),
   %io:format("~w~n", [Msg]),
-  {reply, {text, << "That's what she said! ", Msg/binary >>}, Req, GameId};
+  {reply, {text, << "ok" >>}, Req, GameId};
 websocket_handle(_Data, Req, GameId) ->
   {ok, Req, GameId}.
 
-websocket_info({moved, _Ref, Msg}, Req, GameId) ->
-  %io:format("~w~n", [Msg]),
-  {reply, {text, Msg}, Req, GameId};
+websocket_info({moved, {X, Y}}, Req, GameId) ->
+  %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
+  {reply, {text, jiffy:encode({[{x, X}, {y, Y}]})}, Req, GameId};
 websocket_info({timeout, _Ref, Msg}, Req, GameId) ->
   {reply, {text, Msg}, Req, GameId};
-websocket_info(_Info, Req, GameId) ->
-  {ok, Req, GameId}.
+websocket_info({hello, Count}, Req, GameId) ->
+  %io:format("!!!WEBINFO!!! ~w~n", [Info]),
+  {reply, {text, list_to_binary(Count)}, Req, GameId}.
 
 websocket_terminate(_Reason, _Req, Pid) ->
-  gen_server:terminate(Pid),
+  %gen_server:terminate(Pid),
   ok.

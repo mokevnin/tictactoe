@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<script type="text/javascript" src="http://yandex.st/jquery/1.9.1/jquery.js"></script>
 <script type="text/javascript">
 
 function getURLParameter(name) {
@@ -14,7 +15,6 @@ function getURLParameter(name) {
 
   ws.onopen = function() {
     // Web Socket is connected, send data using send()
-    ws.send("Message to send");
     console.log("Message is sent...");
   };
 
@@ -29,17 +29,54 @@ function getURLParameter(name) {
     // websocket is closed.
     console.log("Connection is closed..."); 
   };
+
+  $(function(){
+    $("td").click(function(el) {
+      console.log(el);
+      var td = $(el.currentTarget);
+      var x = td.parent().children().index(td);
+      var y = $("table tr").index(td.parent());
+      ws.send('{"x":' + (x + 1) + "," + '"y":' + (y + 1) + "}");
+    });
+  });
 </script>
 </head>
 <body>
-<table>
+<table border="1" width="200" height="200">
   <tr>
-    <td id="id1"></td>
-    <td id="id2"></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
   </tr>
   <tr>
-    <td id="id3"></td>
-    <td id="id4"></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
   </tr>
 </table>
 </body>
