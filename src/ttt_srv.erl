@@ -11,15 +11,17 @@ start_link() ->
 
 init([]) -> {ok, ets:new(?MODULE, [])}.
 
-handle_call({new, AuthorKey}, _From, GameList) -> 
+handle_call({new}, _From, GameList) -> 
   {ok, Pid} = gen_server:start_link(game, [], []),
-  ets:insert_new(GameList, {Pid, {pair_waiting, AuthorKey}}),
+  ets:insert_new(GameList, {Pid, {players_waiting}}),
   Reply = {ok, Pid},
   {reply, Reply, GameList};
 
 handle_call({join, Game, Key}, _From, GameList) ->
   Reply = case ets:lookup(GameList, Game) of
-    [{Game, {pair_waiting, Key}}]  -> {ok, already_joined};
+    [{Game, {players_waiting}}]  -> ets:delete(GameList, Game),
+                                    ets:insert_new(GameList, {Game,  {pair_waiting, Key}}),
+                                    {ok, joined};
     [{Game, {pair_waiting, AuthorKey}}] -> ets:delete(GameList, Game), 
                                   ets:insert_new(GameList, {Game,  {game_ready, AuthorKey, Key}}), 
                                   {ok, joined};
