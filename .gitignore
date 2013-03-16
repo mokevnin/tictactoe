@@ -1,4 +1,4 @@
 rebar
 ebin
 deps
-*.crash
+*.dump
