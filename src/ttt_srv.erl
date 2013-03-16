@@ -28,7 +28,12 @@ handle_call({join, Pid, Key}, _From, GameList) ->
   {reply, Reply, GameList};   
 handle_call({move, Coords, Key, Game}, _From, GameList) -> 
   Reply = case ets:lookup(GameList, Game) of
-    {Game, _} -> gen_server:call(Game, {move, Coords, Key});
+    {Game, {game_ready, Key1, Key2}} -> 
+      OpKey = get_opponent({Key1, Key2}, Key),
+      case gen_server:call(Game, {move, Coords, Key}) of
+        {ok, {X,Y}} ->  OpKey! {moved, {X, Y}}, {ok, {X,Y}}; 
+        {ok, win} -> Key! {ok, won}, OpKey! {ok, lost}, {ok, win}
+      end; 
     _ -> {error, game_desnt_exist} 
   end,
   {reply, Reply, GameList};
@@ -40,4 +45,9 @@ handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.
 terminate(_Reason, _State) -> ok.
 code_change(_OldVsn, State, _Extra) -> {ok, State}.
+
+get_opponent({Key1, Key2}, Key) when Key1 == Key -> Key2;
+get_opponent({Key1, Key2}, Key) when Key2 == Key -> Key1.
+    
+
 
