@@ -38,7 +38,7 @@ handle_call({move, Coords, Game, Key}, _From, GameList) ->
         {ok, {X, Y}} -> get_pid(OpKey)!{moved, {X, Y}}, 
                         {ok, {X,Y}}; 
         {ok, win} ->  get_pid(Key)!{ok, won}, 
-                      get_pid(OpKey)!{moved, {X, Y}}, 
+                      get_pid(OpKey)!{moved, Coords}, 
                       get_pid(OpKey)!{ok, lost}, 
                       {ok, win}
       end; 
@@ -51,8 +51,11 @@ handle_call({games}, _From, GameList) ->
   {reply, Reply, GameList};
 
 handle_call({stop_child, Game}, _From, GameList) ->
-  ets:delete(GameList, Game),
-  gen_server:call(Game, stop),
+  case ets:lookup(GameList, Game) of
+    [{Game, _}] -> ets:delete(GameList, Game),
+                   gen_server:call(Game, stop);
+    [] -> ok
+  end,
   {reply, {action, stopped}, GameList}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
