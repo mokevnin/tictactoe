@@ -4,3 +4,4 @@ deps
 *.dump
 *.beam
 node_modules
+.package-index
