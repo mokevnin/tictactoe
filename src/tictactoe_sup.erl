@@ -1,5 +1,5 @@
 
--module(myapp_sup).
+-module(tictactoe_sup).
 
 -behaviour(supervisor).
 
