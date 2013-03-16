@@ -10,7 +10,10 @@ start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 init([]) -> area:init().
 
 handle_call({move, Coords, Key}, _From, Area) ->
-  Reply = area:move(Key, Coords, Area),
+  Reply = case get(previous_key) of 
+            Key -> {error, out_of_turn};
+            _ -> put(previous_key, Key),  area:move(Key, Coords, Area)
+          end,
   {reply, Reply, Area};
 handle_call(stop, _From, Area) ->
            {stop, normal, stopped, Area}.
