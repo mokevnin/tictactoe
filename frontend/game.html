@@ -20,7 +20,7 @@ function getURLParameter(name) {
 
   ws.onmessage = function (evt) {
     console.log(evt.data);
-    var res = $.parseJSON(evt.data);
+    window.res = $.parseJSON(evt.data);
     console.log(res);
     if (res.action == "joined") {
       if (res.data.player == 1) {
@@ -30,8 +30,8 @@ function getURLParameter(name) {
       };
     };
     if (res.action == "moved") {
-      var tr = $("table tr").eq(data.y);
-      tr.eq(data.x).children().html(1);
+      var tr = $("table tr").eq(res.data.y - 1);
+      tr.children().eq(res.data.x - 1).html(1);
     };
 
   };
