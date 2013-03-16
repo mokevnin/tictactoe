@@ -12,7 +12,10 @@
 start(_StartType, _StartArgs) ->
   Dispatch = cowboy_router:compile([
       %% {URIHost, list({URIPath, Handler, Opts})}
-      {'_', [{"/", tictactoe_handler, []}]}
+      {'_', [
+        {"/games", create_handler, []},
+        {"/games/:id", ws_join_handler, []}
+      ]}
   ]),
   %% Name, NbAcceptors, TransOpts, ProtoOpts
   cowboy:start_http(my_http_listener, 100,
