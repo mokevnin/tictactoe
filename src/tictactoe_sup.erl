@@ -24,5 +24,8 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    {ok, { {one_for_one, 5, 10}, []} }.
+    {ok, { {one_for_one, 5, 10}, [
+        { ttt_srv, { ttt_srv, start_link, [] },
+        permanent, 10000, worker, [ttt_srv]}
+    ]} }.
 
