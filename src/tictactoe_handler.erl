@@ -8,7 +8,9 @@ init(_Transport, Req, []) ->
   {ok, Req, undefined}.
 
 handle(Req, State) ->
-  {ok, Req, State}.
+  Req2 = cowboy_req:reply(200,
+    [], "privet", Req),
+  {ok, Req2, State}.
 
 terminate(_Reason, _Req, _State) ->
   ok.

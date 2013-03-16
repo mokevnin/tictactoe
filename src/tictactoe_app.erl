@@ -10,19 +10,15 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-  %ok = application:start(crypto),
-  %ok = application:start(ranch),
-  %ok = application:start(cowboy),
-
-  %Dispatch = cowboy_router:compile([
-      %%% {URIHost, list({URIPath, Handler, Opts})}
-      %{'_', [{'_', tictactoe_handler, []}]}
-  %]),
-  %%% Name, NbAcceptors, TransOpts, ProtoOpts
-  %cowboy:start_http(my_http_listener, 100,
-      %[{port, 8080}],
-      %[{env, [{dispatch, Dispatch}]}]
-  %).
+  Dispatch = cowboy_router:compile([
+      %% {URIHost, list({URIPath, Handler, Opts})}
+      {'_', [{"/", tictactoe_handler, []}]}
+  ]),
+  %% Name, NbAcceptors, TransOpts, ProtoOpts
+  cowboy:start_http(my_http_listener, 100,
+      [{port, 8080}],
+      [{env, [{dispatch, Dispatch}]}]
+  ),
 
   tictactoe_sup:start_link().
 
