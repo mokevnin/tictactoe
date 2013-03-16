@@ -24,11 +24,10 @@ websocket_handle({text, Msg}, Req, GameId) ->
   %{Y, Req3} = cowboy_req:qs_val(<<"y">>, Req2),
 
   io:format("!!!!! ~p~n", [[GameId, X, Y]]),
-  {ok, _} = gen_server:call(ttt_srv, {move, {X, Y}, GameId, self()}),
-
-  %BinaryReply = list_to_binary(io_lib:format("~w~n", [Msg])),
-  %io:format("~w~n", [Msg]),
-  {reply, {text, jiffy:encode({[{action, result}, {data, ok}]})}, Req, GameId};
+  case gen_server:call(ttt_srv, {move, {X, Y}, GameId, self()}) of
+    {ok, _} -> {reply, {text, jiffy:encode({[{action, result}, {data, ok}]})}, Req, GameId};
+    {error, Msg} -> {reply, {text, jiffy:encode({[{action, error}, {data, Msg}]})}, Req, GameId}
+  end;
 websocket_handle(_Data, Req, GameId) ->
   {ok, Req, GameId}.
 
@@ -48,5 +47,5 @@ websocket_info({hello, Count}, Req, GameId) ->
   {reply, {text, jiffy:encode({[{action, joined}, {data, {[{player, Count}]}}]})}, Req, GameId}.
 
 websocket_terminate(_Reason, _Req, Pid) ->
-  %gen_server:terminate(Pid),
+  gen_server:call(ttt_srv, {stop_child, Pid}),
   ok.

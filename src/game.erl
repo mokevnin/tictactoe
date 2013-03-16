@@ -11,7 +11,9 @@ init([]) -> area:init().
 
 handle_call({move, Coords, Key}, _From, Area) ->
   Reply = area:move(Key, Coords, Area),
-  {reply, Reply, Area}.
+  {reply, Reply, Area};
+handle_call(stop, _From, Area) ->
+           {stop, normal, stopped, Area}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.
