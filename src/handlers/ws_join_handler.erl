@@ -45,7 +45,7 @@ websocket_info({timeout, _Ref, Msg}, Req, GameId) ->
   {reply, {text, Msg}, Req, GameId};
 websocket_info({hello, Count}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Info]),
-  {reply, {text, jiffy:encode({[{action, joined}, {data, [player, Count]}]})}, Req, GameId}.
+  {reply, {text, jiffy:encode({[{action, joined}, {data, {[{player, Count}]}}]})}, Req, GameId}.
 
 websocket_terminate(_Reason, _Req, Pid) ->
   %gen_server:terminate(Pid),

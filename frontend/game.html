@@ -19,10 +19,9 @@ function getURLParameter(name) {
   };
 
   ws.onmessage = function (evt) {
-    console.log(evt.data);
     window.res = $.parseJSON(evt.data);
-    console.log(res);
     if (res.action == "joined") {
+      console.log("вы игрок номер:" + res.data.player);
       if (res.data.player == 1) {
         window.figure = 'x';
       } else {
@@ -32,6 +31,14 @@ function getURLParameter(name) {
     if (res.action == "moved") {
       var tr = $("table tr").eq(res.data.y - 1);
       tr.children().eq(res.data.x - 1).html(1);
+    };
+
+    if (res.action == "result") {
+      if (res.data == "lost") {
+        alert("вы повержены");
+      } else {
+        alert("вы победили");
+      };
     };
 
   };
