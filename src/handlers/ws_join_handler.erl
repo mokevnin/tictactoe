@@ -35,11 +35,17 @@ websocket_handle(_Data, Req, GameId) ->
 websocket_info({moved, {X, Y}}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
   {reply, {text, jiffy:encode({[{x, X}, {y, Y}]})}, Req, GameId};
+websocket_info({ok, won}, Req, GameId) ->
+  %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
+  {reply, {text, jiffy:encode({[{result, won}]})}, Req, GameId};
+websocket_info({ok, lost}, Req, GameId) ->
+  %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
+  {reply, {text, jiffy:encode({[{result, lost}]})}, Req, GameId};
 websocket_info({timeout, _Ref, Msg}, Req, GameId) ->
   {reply, {text, Msg}, Req, GameId};
 websocket_info({hello, Count}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Info]),
-  {reply, {text, list_to_binary(Count)}, Req, GameId}.
+  {reply, {text, jiffy:encode({[{player, Count}]})}, Req, GameId}.
 
 websocket_terminate(_Reason, _Req, Pid) ->
   %gen_server:terminate(Pid),
