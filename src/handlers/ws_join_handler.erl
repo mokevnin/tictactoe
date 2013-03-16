@@ -28,7 +28,7 @@ websocket_handle({text, Msg}, Req, GameId) ->
 
   %BinaryReply = list_to_binary(io_lib:format("~w~n", [Msg])),
   %io:format("~w~n", [Msg]),
-  {reply, {text, << "ok" >>}, Req, GameId};
+  {reply, {text, jiffy:encode({[{result, ok}]})}, Req, GameId};
 websocket_handle(_Data, Req, GameId) ->
   {ok, Req, GameId}.
 
@@ -44,7 +44,7 @@ websocket_info({ok, lost}, Req, GameId) ->
 websocket_info({timeout, _Ref, Msg}, Req, GameId) ->
   {reply, {text, Msg}, Req, GameId};
 websocket_info({hello, Count}, Req, GameId) ->
-  %io:format("!!!WEBINFO!!! ~w~n", [Info]),
+  %io:format("!!!WEBINFO!!! ~w~n", [Count]),
   {reply, {text, jiffy:encode({[{player, Count}]})}, Req, GameId}.
 
 websocket_terminate(_Reason, _Req, Pid) ->
