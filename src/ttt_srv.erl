@@ -42,7 +42,8 @@ handle_call({move, Coords, Game, Key}, _From, GameList) ->
                       get_pid(OpKey)!{ok, lost}, 
                       {ok, win}
       end; 
-    [] -> {error, game_doesnt_exist} 
+    [] -> {error, game_doesnt_exist};
+    [{Game, {pair_waiting, _}}] -> {error, game_isnt_ready} 
   end,
   {reply, Reply, GameList};
 
