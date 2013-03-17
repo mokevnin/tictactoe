@@ -12,6 +12,7 @@ function getURLParameter(name) {
 
   // Let us open a web socket
   var ws = new WebSocket("ws://localhost:8080/games/" + getURLParameter("id"));
+  var figure, opposite_figure;
 
   ws.onopen = function() {
     // Web Socket is connected, send data using send()
@@ -23,21 +24,27 @@ function getURLParameter(name) {
     if (res.action == "joined") {
       console.log("вы игрок номер:" + res.data.player);
       if (res.data.player == 1) {
-        window.figure = 'x';
+        figure = 'x';
+        opposite_figure = 'o';
       } else {
-        window.figure = 'o';
+        figure = 'o';
+        opposite_figure = 'x';
       };
+      window.figure = figure;
     };
     if (res.action == "moved") {
       var tr = $("table tr").eq(res.data.y - 1);
-      tr.children().eq(res.data.x - 1).html(1);
+      tr.children().eq(res.data.x - 1).html(opposite_figure);
     };
 
     if (res.action == "result") {
       if (res.data == "lost") {
-        alert("вы повержены");
-      } else {
-        alert("вы победили");
+        $("#score").empty();
+        $("#score").append("вы повержены");
+      } 
+      if (res.data == "won") {
+        $("#score").empty();
+        $("#score").append("вы победили");
       };
     };
 
@@ -61,6 +68,7 @@ function getURLParameter(name) {
 </script>
 </head>
 <body>
+<div id = 'score'></div>
 <table border="1" width="300" height="300" style="text-align:center;padding:0;margin:0;">
   <tr>
     <td></td>
