@@ -21,10 +21,10 @@ handle_call({join, Game, Key}, _From, GameList) ->
   Reply = case ets:lookup(GameList, Game) of
     [{Game, {players_waiting}}]  -> ets:delete(GameList, Game),
                                     ets:insert_new(GameList, {Game,  {pair_waiting, Key}}),
-                                    {ok, "1"};
+                                    {ok, 1};
     [{Game, {pair_waiting, AuthorKey}}] -> ets:delete(GameList, Game), 
                                   ets:insert_new(GameList, {Game,  {game_ready, AuthorKey, Key}}), 
-                                  {ok, "2"};
+                                  {ok, 2};
     [{Game, {game_ready, _, _}}] -> {error, players_exceeded};
     [] -> {error, game_doesnt_exist}
   end,
@@ -35,16 +35,30 @@ handle_call({move, Coords, Game, Key}, _From, GameList) ->
     [{Game, {game_ready, Key1, Key2}}] -> 
       OpKey = get_opponent({Key1, Key2}, Key),
       case gen_server:call(Game, {move, Coords, Key}) of
-        {ok, {X, Y}} -> get_pid(OpKey)!{moved, {X, Y}}, {ok, {X,Y}}; 
-        {ok, win} ->  get_pid(Key)!{ok, won}, get_pid(OpKey)!{ok, lost}, {ok, win}
+        {ok, {X, Y}} -> get_pid(OpKey)!{moved, {X, Y}}, 
+                        {ok, {X,Y}}; 
+        {ok, win} ->  get_pid(Key)!{ok, won}, 
+                      get_pid(OpKey)!{moved, Coords}, 
+                      get_pid(OpKey)!{ok, lost}, 
+                      {ok, win};
+        {error, Msg} -> {error, Msg}
       end; 
-    [] -> {error, game_doesnt_exist} 
+    [] -> {error, game_doesnt_exist};
+    [{Game, {pair_waiting, _}}] -> {error, game_isnt_ready} 
   end,
   {reply, Reply, GameList};
 
 handle_call({games}, _From, GameList) ->
   Reply = ets:tab2list(GameList),
-  {reply, Reply, GameList}.
+  {reply, Reply, GameList};
+
+handle_call({stop_child, Game}, _From, GameList) ->
+  case ets:lookup(GameList, Game) of
+    [{Game, _}] -> ets:delete(GameList, Game),
+                   gen_server:call(Game, stop);
+    [] -> ok
+  end,
+  {reply, {action, stopped}, GameList}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.

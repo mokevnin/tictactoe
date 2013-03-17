@@ -18,10 +18,29 @@ function getURLParameter(name) {
     console.log("Message is sent...");
   };
 
-  ws.onmessage = function (evt) 
-  { 
-    var received_msg = evt.data;
-    console.log(received_msg);
+  ws.onmessage = function (evt) {
+    window.res = $.parseJSON(evt.data);
+    if (res.action == "joined") {
+      console.log("вы игрок номер:" + res.data.player);
+      if (res.data.player == 1) {
+        window.figure = 'x';
+      } else {
+        window.figure = 'o';
+      };
+    };
+    if (res.action == "moved") {
+      var tr = $("table tr").eq(res.data.y - 1);
+      tr.children().eq(res.data.x - 1).html(1);
+    };
+
+    if (res.action == "result") {
+      if (res.data == "lost") {
+        alert("вы повержены");
+      } else {
+        alert("вы победили");
+      };
+    };
+
   };
 
   ws.onclose = function()
@@ -32,8 +51,8 @@ function getURLParameter(name) {
 
   $(function(){
     $("td").click(function(el) {
-      console.log(el);
       var td = $(el.currentTarget);
+      td.html(window.figure);
       var x = td.parent().children().index(td);
       var y = $("table tr").index(td.parent());
       ws.send('{"x":' + (x + 1) + "," + '"y":' + (y + 1) + "}");
@@ -42,7 +61,7 @@ function getURLParameter(name) {
 </script>
 </head>
 <body>
-<table border="1" width="200" height="200">
+<table border="1" width="300" height="300" style="text-align:center;padding:0;margin:0;">
   <tr>
     <td></td>
     <td></td>

@@ -10,10 +10,15 @@ start_link() -> gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 init([]) -> area:init().
 
 handle_call({move, Coords, Key}, _From, Area) ->
-  Reply = area:move(Key, Coords, Area),
-  {reply, Reply, Area}.
+  Reply = case get(previous_key) of 
+            Key -> {error, out_of_turn};
+            _ -> put(previous_key, Key),  area:move(Key, Coords, Area)
+          end,
+  {reply, Reply, Area};
+handle_call(stop, _From, Area) ->
+           {stop, normal, stopped, Area}.
 
 handle_cast(_Msg, State) -> {noreply, State}.
 handle_info(_Info, State) -> {noreply, State}.
 terminate(_Reason, _State) -> ok.
-code_change(_OldVsn, State, Extra) -> {ok, State}.
+code_change(_OldVsn, State, _Extra) -> {ok, State}.

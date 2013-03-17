@@ -24,29 +24,28 @@ websocket_handle({text, Msg}, Req, GameId) ->
   %{Y, Req3} = cowboy_req:qs_val(<<"y">>, Req2),
 
   io:format("!!!!! ~p~n", [[GameId, X, Y]]),
-  {ok, _} = gen_server:call(ttt_srv, {move, {X, Y}, GameId, self()}),
-
-  %BinaryReply = list_to_binary(io_lib:format("~w~n", [Msg])),
-  %io:format("~w~n", [Msg]),
-  {reply, {text, << "ok" >>}, Req, GameId};
+  case gen_server:call(ttt_srv, {move, {X, Y}, GameId, self()}) of
+    {ok, _} -> {reply, {text, jiffy:encode({[{action, result}, {data, ok}]})}, Req, GameId};
+    {error, ErrMsg} -> {reply, {text, jiffy:encode({[{action, error}, {data, ErrMsg}]})}, Req, GameId}
+  end;
 websocket_handle(_Data, Req, GameId) ->
   {ok, Req, GameId}.
 
 websocket_info({moved, {X, Y}}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
-  {reply, {text, jiffy:encode({[{x, X}, {y, Y}]})}, Req, GameId};
+  {reply, {text, jiffy:encode({[{action, moved}, {data, {[{x, X}, {y, Y}]}}]})}, Req, GameId};
 websocket_info({ok, won}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
-  {reply, {text, jiffy:encode({[{result, won}]})}, Req, GameId};
+  {reply, {text, jiffy:encode({[{action, result}, {data, won}]})}, Req, GameId};
 websocket_info({ok, lost}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Msg]),
-  {reply, {text, jiffy:encode({[{result, lost}]})}, Req, GameId};
+  {reply, {text, jiffy:encode({[{action, result}, {data, lost}]})}, Req, GameId};
 websocket_info({timeout, _Ref, Msg}, Req, GameId) ->
   {reply, {text, Msg}, Req, GameId};
 websocket_info({hello, Count}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Info]),
-  {reply, {text, jiffy:encode({[{player, Count}]})}, Req, GameId}.
+  {reply, {text, jiffy:encode({[{action, joined}, {data, {[{player, Count}]}}]})}, Req, GameId}.
 
-websocket_terminate(_Reason, _Req, Pid) ->
-  %gen_server:terminate(Pid),
+websocket_terminate(_Reason, _Req, GameId) ->
+%  gen_server:call(ttt_srv, {stop_child, GameId}),
   ok.
