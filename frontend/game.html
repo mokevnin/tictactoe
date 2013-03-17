@@ -12,7 +12,7 @@ function getURLParameter(name) {
 
   // Let us open a web socket
   var ws = new WebSocket("ws://localhost:8080/games/" + getURLParameter("id"));
-  var figure, opposite_figure;
+  var figure, opposite_figure, turn_allowed;
 
   ws.onopen = function() {
     // Web Socket is connected, send data using send()
@@ -26,25 +26,36 @@ function getURLParameter(name) {
       if (res.data.player == 1) {
         figure = 'x';
         opposite_figure = 'o';
+        turn_allowed = true;
+        $("#score").empty();
+        $("#score").append("ваш ход");
       } else {
         figure = 'o';
         opposite_figure = 'x';
+        turn_allowed = false;
+        $("#score").empty();
+        $("#score").append("ход противника");
       };
       window.figure = figure;
     };
     if (res.action == "moved") {
       var tr = $("table tr").eq(res.data.y - 1);
       tr.children().eq(res.data.x - 1).html(opposite_figure);
+      turn_allowed = true;
+       $("#score").empty();
+       $("#score").append("ваш ход");
     };
 
     if (res.action == "result") {
       if (res.data == "lost") {
         $("#score").empty();
         $("#score").append("вы повержены");
+        turn_allowed = false;
       } 
       if (res.data == "won") {
         $("#score").empty();
         $("#score").append("вы победили");
+        turn_allowed = false;
       };
     };
 
@@ -58,11 +69,16 @@ function getURLParameter(name) {
 
   $(function(){
     $("td").click(function(el) {
-      var td = $(el.currentTarget);
-      td.html(window.figure);
-      var x = td.parent().children().index(td);
-      var y = $("table tr").index(td.parent());
-      ws.send('{"x":' + (x + 1) + "," + '"y":' + (y + 1) + "}");
+      if (turn_allowed){
+        var td = $(el.currentTarget);
+        td.html(window.figure);
+        var x = td.parent().children().index(td);
+        var y = $("table tr").index(td.parent());
+        ws.send('{"x":' + (x + 1) + "," + '"y":' + (y + 1) + "}");
+        turn_allowed = false;
+        $("#score").empty();
+        $("#score").append("ход противника"); 
+      }
     });
   });
 </script>
