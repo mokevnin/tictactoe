@@ -10,8 +10,9 @@
 start_link(Args) -> gen_server:start_link(?MODULE, Args, []).
 
 init(Id) ->
-  true = gproc:add_local_name(Id),
-  area:init().
+  %true = gproc:add_local_name(Id),
+  %area:init().
+  {ok, Id}.
 
 handle_call({move, Coords, Key}, _From, Area) ->
   Reply = case get(previous_key) of 

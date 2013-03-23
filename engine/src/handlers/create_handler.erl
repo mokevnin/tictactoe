@@ -13,6 +13,5 @@ content_types_provided(Req, State) ->
   ], Req, State}.
 
 create_to_json(Req, State) ->
-  Name = uuid:to_string(uuid:uuid4()),
-  supervisor:start_child(tictactoe_sup, Name),
+  {ok, Name} = tictactoe_sup:start_worker(),
   {iolist_to_binary(jiffy:encode({[{id, list_to_binary(Name)}]})), Req, State}.
