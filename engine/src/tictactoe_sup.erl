@@ -29,7 +29,6 @@ init([]) ->
 
 start_worker() ->
   Name = uuid:to_string(uuid:uuid4()),
-  Result = supervisor:start_child(game_proc, [Name]),
-  io:format("~w~n", [Result]),
-  {ok, Name}.
+  {ok, Pid} = supervisor:start_child(?MODULE, [Name]),
+  {ok, Name, Pid}.
 
