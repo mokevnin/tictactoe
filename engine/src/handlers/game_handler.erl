@@ -1,4 +1,4 @@
--module(ws_join_handler).
+-module(game_handler).
 -behaviour(cowboy_websocket_handler).
 
 -export([init/3]).
@@ -46,6 +46,6 @@ websocket_info({hello, Count}, Req, GameId) ->
   %io:format("!!!WEBINFO!!! ~w~n", [Info]),
   {reply, {text, jiffy:encode({[{action, joined}, {data, {[{player, Count}]}}]})}, Req, GameId}.
 
-websocket_terminate(_Reason, _Req, GameId) ->
+websocket_terminate(_Reason, _Req, _GameId) ->
 %  gen_server:call(ttt_srv, {stop_child, GameId}),
   ok.

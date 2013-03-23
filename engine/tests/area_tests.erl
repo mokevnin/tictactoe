@@ -16,3 +16,12 @@ win_test() ->
   {ok, win} = area:move(tic, {5, 4}, Area),
   ok.
 
+mistake_win_test() -> 
+  {ok, Area} = area:init(),
+  {ok, _} = area:move(tic, {2, 4}, Area),
+  {ok, _} = area:move(tic, {1, 4}, Area),
+  {ok, _} = area:move(tic, {3, 4}, Area),
+  {ok, _} = area:move(tac, {4, 4}, Area),
+  ?assertMatch({ok, {_,_}}, area:move(tic, {5, 4}, Area)),
+  ok.
+

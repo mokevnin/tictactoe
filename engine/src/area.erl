@@ -5,10 +5,13 @@
 init() ->
   {ok, {area, ets:new(?MODULE, []), meta, {}}}.
 
-move(Key, Coords, Tab) ->
+move(Key, Coords, {_, Tab, _, _Meta}) ->
   case ets:insert_new(Tab, {Coords, Key}) of
     false -> {error, exists};
-    _ -> check_win(Coords, Tab)
+    _ -> case check_win(Coords, Tab) of
+        true -> {ok, win};
+        false -> {ok, Coords}
+    end
   end.
 
 check({_X, _Y}, _Tab, Count, _Direction) when Count >= 5 -> Count;
@@ -37,7 +40,4 @@ check_line({X,Y}, Tab, {Dir1, Dir2}) ->
 check_win({X, Y}, Tab) ->   
     Lines = [{up, down}, {left, right}, {up_left, down_right}, {up_right, down_left}],
     Fun = fun ({Dir1, Dir2}) -> check_line({X, Y}, Tab, {Dir1, Dir2}) end,
-    case lists:any(Fun, Lines) of 
-        true ->  {ok, win};
-        _ -> {ok, {X,Y}}
-    end. 
+    lists:any(Fun, Lines).
