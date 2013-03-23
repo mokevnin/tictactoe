@@ -3,7 +3,7 @@
 -export([init/0, move/3]).
 
 init() ->
-  {ok, ets:new(?MODULE, [])}.
+  {ok, {area, ets:new(?MODULE, []), meta, {}}}.
 
 move(Key, Coords, Tab) ->
   case ets:insert_new(Tab, {Coords, Key}) of

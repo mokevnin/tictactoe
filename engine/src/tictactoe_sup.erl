@@ -1,16 +1,15 @@
-
 -module(tictactoe_sup).
 
 -behaviour(supervisor).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, start_worker/1]).
 
 %% Supervisor callbacks
 -export([init/1]).
 
 %% Helper macro for declaring children of supervisor
--define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
+-define(CHILD(I, Restart, Type), {I, {I, start_link, []}, Restart, 5000, Type, [I]}).
 
 %% ===================================================================
 %% API functions
@@ -24,8 +23,9 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    {ok, { {one_for_one, 5, 10}, [
-        { ttt_srv, { ttt_srv, start_link, [] },
-        permanent, 10000, worker, [ttt_srv]}
+    {ok, {{simple_one_for_one, 5, 10}, [
+        ?CHILD(game_proc, temporary, worker)
     ]} }.
 
+start_worker(Args) ->
+      supervisor:start_child(game_proc, [Args]).
