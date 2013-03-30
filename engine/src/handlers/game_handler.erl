@@ -1,4 +1,7 @@
 -module(game_handler).
+
+-compile({parse_transform, seqbind}).
+
 -behaviour(cowboy_websocket_handler).
 
 -export([init/3]).

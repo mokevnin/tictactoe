@@ -31,7 +31,7 @@ dispatch_rules() ->
   cowboy_router:compile([
       %% {URIHost, list({URIPath, Handler, Opts})}
       {'_', [
-          {"/test", index_handler, []},
+          {"/", index_handler, []},
           {"/games", create_handler, []},
           {"/games/:id", ws_join_handler, []}
           ]}

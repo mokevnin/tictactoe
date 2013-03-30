@@ -2,9 +2,9 @@
 -include_lib("eunit/include/eunit.hrl").
 
 insert_test() ->
-  {ok, Area} = area:init(),
-  {ok, _, _} = area:move(tic, {2, 3}, Area),
-  ?assertMatch({error, exists, _}, area:move(tic, {2, 3}, Area)),
+  {ok, Area} = tictac:init(),
+  {ok, _, _} = tictac:move(tic, {2, 3}, Area),
+  ?assertMatch({error, exists, _}, tictac:move(tic, {2, 3}, Area)),
   ok.
 
 dublicate_test() ->

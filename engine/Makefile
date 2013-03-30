@@ -11,7 +11,7 @@ compile: clean
 clean:
 	@( $(REBAR) clean )
 
-run: compile
+run:
 	@( erl -pa ebin deps/*/ebin -boot start_sasl -s tictactoe )
 
 eunit:

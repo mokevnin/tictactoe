@@ -7,20 +7,24 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
          terminate/2, code_change/3]).
 
--record(state, {area}).
+-record(state, {tictac, users}).
 
 start_link(Args) -> gen_server:start_link(?MODULE, Args, []).
 
 init(ProcName) ->
   true = gproc:add_local_name(ProcName),
-  Area = area:init(),
-  {ok, Area}.
+  Users = ets:new(?MODULE, []),
+  Tictac = tictac:init(),
+  State = #state{tictac=Tictac, users=Users},
+  {ok, State}.
 
-handle_call({join, Id}, _From, State) ->
-  {reply, result, State};
+handle_call({join, Id}, _From, #state{users=Users} = State) ->
+  User = ets:lookup(Users, Id),
+  State2 = State#state{users=Users ++ User},
+  {reply, ok, State2};
 
 handle_call({move, Coords, Id}, _From, State) ->
-  Result = case area:move(tic, Coords, #state{area=Area} = State) of
+  Result = case tictac:move(tic, Coords, #state{tictac=Tictac} = State) of
     {ok, Msg, Area2} ->
       case Msg of
         win -> ok %send_to_all_exclude_me({win, Coords}),
@@ -28,7 +32,7 @@ handle_call({move, Coords, Id}, _From, State) ->
     {error, Msg, Area2} ->
       {error, Msg}
   end,
-  {reply, Result, State#state{area=Area2}};
+  {reply, Result, State#state{tictac=Tictac}};
 
 handle_call(stop, _From, State) ->
   {stop, normal, State}.
