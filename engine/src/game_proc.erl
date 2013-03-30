@@ -35,7 +35,7 @@ handle_call({move, Coords, Id}, _From, State) ->
   {reply, Result, State#state{tictac=Tictac}};
 
 handle_call(state, _From, State) ->
-  {reply, {ok, State}, State}.
+  {reply, {ok, State}, State};
 
 handle_call(stop, _From, State) ->
   {stop, normal, State}.

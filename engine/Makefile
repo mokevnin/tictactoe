@@ -15,7 +15,7 @@ run:
 	@( erl -pa ebin deps/*/ebin -boot start_sasl -s tictactoe )
 
 eunit:
-	@( $(REBAR) eunit skip_deps=true )
+	@( $(REBAR) eunit skip_deps=true -vvv )
 
 .PHONY: all deps compile clean run
 
