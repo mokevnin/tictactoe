@@ -33,7 +33,8 @@ dispatch_rules() ->
       {'_', [
           {"/", index_handler, []},
           {"/games", create_handler, []},
-          {"/games/:id", ws_join_handler, []}
+          %{"/games/:id", ws_join_handler, []},
+          {"/games/:id", bullet_handler, [{handler, mybullet_handler}]}
           ]}
       ]).
 
