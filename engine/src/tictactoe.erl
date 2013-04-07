@@ -3,7 +3,7 @@
 %% API.
 -export([start/0, stop/0, update_routes/0]).
 
--define(APPS, [crypto, ranch, cowboy, gproc, tictactoe]).
+-define(APPS, [lager, crypto, ranch, cowboy, gproc, tictactoe]).
 
 %% ===================================================================
 %% API functions

@@ -25,11 +25,11 @@ handle_call({join, Id}, _From, #state{users=Users} = State) ->
 
 handle_call({move, Coords, Id}, _From, State) ->
   Result = case tictac:move(tic, Coords, #state{tictac=Tictac} = State) of
-    {ok, Msg, Area2} ->
+    {ok, Msg, Tictac} ->
       case Msg of
         win -> ok %send_to_all_exclude_me({win, Coords}),
       end;
-    {error, Msg, Area2} ->
+    {error, Msg, Tictac} ->
       {error, Msg}
   end,
   {reply, Result, State#state{tictac=Tictac}};

@@ -3,3 +3,6 @@ deps
 *.dump
 *.beam
 .eunit
+.DS_Store
+logs
+log
